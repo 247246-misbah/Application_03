@@ -1,0 +1,96 @@
+﻿@page "/todo"
+@rendermode InteractiveServer
+
+<div class="todo-page-container">
+    <div class="todo-card">
+        
+        <div class="todo-header">
+            <h2>Task Manager</h2>
+            <p>Stay organized and productive</p>
+        </div>
+
+        <div class="todo-input-group">
+            <input type="text"
+                   class="form-control todo-input"
+                   placeholder="What needs to be done?"
+                   @bind="newTask"
+                   @bind:event="oninput"
+                   @onkeyup="HandleKeyUp" />
+            
+            <button class="btn btn-primary todo-add-btn"
+                    disabled="@string.IsNullOrWhiteSpace(newTask)"
+                    @onclick="AddTask">
+                Add
+            </button>
+        </div>
+
+        <div class="todo-actions-bar">
+            <span class="task-count">
+                Tasks: <span class="badge-count">@taskList.Count</span>
+            </span>
+            
+            @if (taskList.Count > 0)
+            {
+                <button class="btn-clear-all" @onclick="ClearAll">
+                    Clear All
+                </button>
+            }
+        </div>
+
+        <div class="todo-list-wrapper">
+            @if (taskList.Count == 0)
+            {
+                <div class="empty-state">
+                    <p>No tasks yet. Enjoy your day!</p>
+                </div>
+            }
+            else
+            {
+                <ul class="list-group todo-list">
+                    @foreach (var task in taskList)
+                    {
+                        <li class="list-group-item todo-item">
+                            <span class="task-text">@task</span>
+                            <button class="btn-delete" @onclick="() => RemoveTask(task)" title="Delete Task">
+                                <span class="bi bi-trash" aria-hidden="true"></span>
+                            </button>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private string newTask = string.Empty;
+    private List<string> taskList = new List<string>();
+
+    private void AddTask()
+    {
+        if (!string.IsNullOrWhiteSpace(newTask))
+        {
+            taskList.Add(newTask.Trim());
+            newTask = string.Empty;
+        }
+    }
+
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            AddTask();
+        }
+    }
+
+    private void RemoveTask(string task)
+    {
+        taskList.Remove(task);
+    }
+
+    private void ClearAll()
+    {
+        taskList.Clear();
+    }
+}
